@@ -1,0 +1,40 @@
+version: '3'
+services:
+  app:
+    build: .
+    ports: 
+      - 8080:8080
+    volumes:
+      - ./app:/code/app
+    env_file:
+      - env/local.env
+    environment:
+      - FLASK_DEBUG=true
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1
+    network_mode: bridge
+    command:
+      - /bin/bash
+      - -c
+      - |
+        cd /code
+        pip install --upgrade pip && pip install poetry
+        poetry config virtualenvs.create false
+        poetry install
+        python -m uvicorn app.api.main:app --host 0.0.0.0 --port 8080 --reload
+
+
+  postgresdb:
+    image: postgres
+    restart: unless-stopped
+    env_file:
+      - env/local.env
+    ports: 
+      - 5432:5432
+
+  adminer:
+    image: adminer
+    restart: unless-stopped
+    ports:
+      - 8081:8080
