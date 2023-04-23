@@ -1,2 +1,4 @@
 .python-version
 .python_version
+
+*__pycache__
