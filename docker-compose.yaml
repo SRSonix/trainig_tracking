@@ -5,7 +5,7 @@ services:
     ports: 
       - 8080:8080
     volumes:
-      - ./app:/code/app
+      - ./app/api:/code/api
     env_file:
       - env/local.env
     environment:
@@ -22,8 +22,10 @@ services:
         pip install --upgrade pip && pip install poetry
         poetry config virtualenvs.create false
         poetry install
-        python -m uvicorn app.api.main:app --host 0.0.0.0 --port 8080 --reload
-
+        
+        python -m uvicorn api.main:app --host 0.0.0.0 --port 8080 --reload
+    depends_on:
+      - postgresdb
 
   postgresdb:
     image: postgres
@@ -32,9 +34,13 @@ services:
       - env/local.env
     ports: 
       - 5432:5432
+    volumes:
+      - ./pgData:/var/lib/psotgresql/data
 
   adminer:
     image: adminer
     restart: unless-stopped
     ports:
       - 8081:8080
+    depends_on:
+      - postgresdb
