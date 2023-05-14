@@ -5,10 +5,18 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
 class UniqueIdException(Exception):
-    pass
+    def __init__(self,message, class_str: str, id: str):
+        super().__init__(message)
+        self.message = message
+        self.class_str = class_str
+        self.id = id
 
 class ItemNotFoundException(Exception):
-    pass
+    def __init__(self,message, class_str: str, id: str):
+        super().__init__(message)
+        self.message = message
+        self.class_str = class_str
+        self.id = id
 
 
 def get_engine() -> Engine:

@@ -3,9 +3,9 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
-from api.crud import skills as crud
+from api.crud.crud import SkillCrud
 from api.crud.utils import UniqueIdException, ItemNotFoundException
-from api.schemas import Skill as SkillSchema
+from api.schemas import Skill
 from api.utils import get_db
 
 router = APIRouter(
@@ -15,25 +15,40 @@ router = APIRouter(
         404: {"description": "Not found"}},
 )
 
-@router.post("/", response_model=SkillSchema)
-def insert_skill(skill: SkillSchema, db: Session = Depends(get_db)):
-    try:
-        db_skill = crud.create_skill(skill, db=db)
-    except UniqueIdException:
-        raise HTTPException(409, "skill id already exists in database.")
-    return SkillSchema.parse_orm(db_skill)
-
-@router.delete("/{skill_id}")
-def delete_skill(skill_id: str, db: Session = Depends(get_db)):
-    try:
-        skills = crud.delete_skill(skill_id, db=db)
-    except ItemNotFoundException:
-        raise HTTPException(404, f"no skill found with id {skill_id}")
-        
-    return {"details": f"skill {skill_id} successfully deltetd"}
-
-@router.get("/", response_model=List[SkillSchema])
+@router.get("/", response_model=List[Skill])
 def get_skills(db: Session = Depends(get_db)):
-    skills = crud.get_skills(db=db)
+    skills = SkillCrud(db=db).get()
     
-    return [SkillSchema.parse_orm(skill) for skill in skills]
+    return [Skill.parse_orm(skill) for skill in skills]
+    
+@router.post("/", response_model=Skill)
+def insert_skill(skill: Skill, db: Session = Depends(get_db)):
+    try:
+        db_skill = SkillCrud(db=db).create(skill)
+    except ItemNotFoundException as e:
+        raise HTTPException(422, e.message)
+    except UniqueIdException as e:
+        raise HTTPException(409, e.message)
+    return Skill.parse_orm(db_skill)
+
+@router.put("/{id}", response_model=Skill)
+def replace_skill(id: str, skill: Skill, db: Session = Depends(get_db)):
+    if id != skill.id:
+        raise HTTPException(422, "Skill id must be correspond to the one in the URL.")
+    
+    try:
+        skill = SkillCrud(db=db).replace(skill=skill)
+    except ItemNotFoundException as e:
+        raise HTTPException(404, e.message)
+        
+    return Skill.parse_orm(skill)
+
+
+@router.delete("/{id}")
+def delete_skill(id: str, db: Session = Depends(get_db)):
+    try:
+        SkillCrud(db=db).delete(id)
+    except ItemNotFoundException as e:
+        raise HTTPException(404, e.message)
+        
+    return {"details": f"skill {id} successfully deltetd"}

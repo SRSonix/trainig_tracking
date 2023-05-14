@@ -1,4 +1,4 @@
-from __future__ import annotations
+#from __future__ import annotations
 from typing import List
 
 import enum
@@ -24,21 +24,21 @@ exercise_skill = Table(
 
 class Skill(Base):
     __tablename__ = "skills"
-
+    
     id = Column(VARCHAR(32), primary_key=True, nullable=False)
     description = Column(Text, nullable=True)
-    excercises: Mapped[List[Exercise]] = relationship(
+    excercises: Mapped[List["Exercise"]] = relationship(
         secondary=exercise_skill, back_populates="skills"
     )
-
+    
 class Exercise(Base):
     __tablename__ = "exercises"
-
+    
     id = Column(VARCHAR(32), primary_key=True, nullable=False)
     variation = Column(VARCHAR(32), primary_key=True, nullable=False)
     domain = Column(Enum(DOMAIN), nullable=False)
     description = Column(Text, nullable=True)
-    skills: Mapped[List[Skill]] = relationship(
+    skills: Mapped[List["Skill"]] = relationship(
         secondary=exercise_skill, back_populates="excercises"
     )
 
