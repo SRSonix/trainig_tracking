@@ -4,8 +4,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from training_tracking.api.crud.crud import SkillCrud
-from training_tracking.api.crud.utils import UniqueIdException, ItemNotFoundException
-from training_tracking.api.schemas import Skill
+from training_tracking.api.crud.utils import UniqueIdException, ItemNotFoundException, DependentItemNotFoundException
+from training_tracking.api.schemas import Skill, SkillAttributes
 from training_tracking.api.utils import get_db
 
 router = APIRouter(
@@ -34,14 +34,15 @@ def insert_skill(skill: Skill, db: Session = Depends(get_db)):
 
 
 @router.put("/{id}", response_model=Skill)
-def replace_skill(id: str, skill: Skill, db: Session = Depends(get_db)):
-    if id != skill.id:
-        raise HTTPException(422, "Skill id must be correspond to the one in the URL.")
-    
+def replace_skill(id: str, attributes: SkillAttributes, db: Session = Depends(get_db)):
+    skill = Skill(id=id, **attributes.model_dump())
+
     try:
         skill = SkillCrud(db=db).replace(skill=skill)
     except ItemNotFoundException as e:
         raise HTTPException(404, e.message)
+    except DependentItemNotFoundException as e:
+        raise HTTPException(422, e.message)
         
     return Skill.validate_orm(skill)
 

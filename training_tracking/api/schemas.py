@@ -17,11 +17,13 @@ class ExerciseId(BaseModel):
             variation=excercise.variation
         )
 
-class Exercise(ExerciseId):
+class ExerciseAttributes(BaseModel):
     description: Optional[str] = Field(default=None)
     skill_ids: List[str] = Field(default=[])
     model_config = ConfigDict(extra="forbid")
     
+    
+class Exercise(ExerciseId, ExerciseAttributes):
     @staticmethod
     def validate_orm(excercise: ExerciseORM,) -> Exercise:
         return Exercise(
@@ -32,12 +34,17 @@ class Exercise(ExerciseId):
         )
 
 
-class Skill(BaseModel):
+class SkillId(BaseModel):
     id: Annotated[str, StringConstraints(min_length=1)]  = Field(...)
+    
+    
+class SkillAttributes(BaseModel):
     description: str = Field(default="")
     excercise_ids: List[ExerciseId] = Field(default=[])
     model_config = ConfigDict(extra="forbid")
     
+
+class Skill(SkillId, SkillAttributes):
     @staticmethod
     def validate_orm(skill: SkillORM) -> Skill:
         skill =  Skill(

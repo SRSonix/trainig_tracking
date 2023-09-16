@@ -6,7 +6,7 @@ from sqlalchemy.exc import IntegrityError
 
 from training_tracking.api.crud.models import Skill, Exercise
 from training_tracking.api.schemas import Skill as SkillSchema, Exercise as ExerciseSchema
-from training_tracking.api.crud.utils import UniqueIdException, ItemNotFoundException
+from training_tracking.api.crud.utils import UniqueIdException, ItemNotFoundException, DependentItemNotFoundException
 
 
 class Crud(ABC):
@@ -43,9 +43,13 @@ class SkillCrud(Crud):
         skill_db = Skill(id=skill.id, description=skill.description)
         exercise_crud = ExerciseCrud(self.db)
         
+        skill_db.excercises = []
         for exercise in skill.excercise_ids:
-            # todo: add error handling for exercide not found
-            skill_db.excercises.append(exercise_crud.get_one(exercise.id, exercise.variation))
+            try: 
+                exercise = exercise_crud.get_one(exercise.id, exercise.variation)
+            except ItemNotFoundException as e:
+                raise DependentItemNotFoundException(e.message, e.class_str, e.id)
+            skill_db.excercises.append(exercise)
                 
         return skill_db
     
@@ -105,9 +109,14 @@ class ExerciseCrud(Crud):
         exercise_db = Exercise(id=exercise.id, variation=exercise.variation, description=exercise.description)
         skill_crud = SkillCrud(self.db)
         
+        skill_crud.skills=[]
         for id in exercise.skill_ids:
-            # todo: add error handling for skill not found
-            exercise_db.skills.append(skill_crud.get_one(id=id))
+            try: 
+                skill = skill_crud.get_one(id=id)
+            except ItemNotFoundException as e:
+                raise DependentItemNotFoundException(e.message, e.class_str, e.id)
+
+            exercise_db.skills.append(skill)
         
         return exercise_db
 
