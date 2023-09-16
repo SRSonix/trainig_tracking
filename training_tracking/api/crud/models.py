@@ -2,11 +2,9 @@
 from typing import List
 
 from sqlalchemy import Table, Column, ForeignKey, VARCHAR, Text, Enum, TIMESTAMP, ForeignKeyConstraint
-from sqlalchemy.orm import relationship, Mapped
+from sqlalchemy.orm import relationship, Mapped, mapped_column
 
-from shared_models.schemas import Domain as DOMAIN
-
-from api.crud.utils import Base
+from training_tracking.api.crud.utils import Base
 
 exercise_skill = Table(
     "exercise_skill",
@@ -20,9 +18,8 @@ exercise_skill = Table(
 class Skill(Base):
     __tablename__ = "skills"
     
-    id = Column(VARCHAR(32), primary_key=True, nullable=False)
-    description = Column(Text, nullable=True)
-    domain = Column(Enum(DOMAIN), nullable=False)
+    id: Mapped[str] = mapped_column(VARCHAR(32), primary_key=True, nullable=False)
+    description = mapped_column(Text, nullable=True)
     excercises: Mapped[List["Exercise"]] = relationship(
         secondary=exercise_skill, back_populates="skills"
     )
@@ -32,18 +29,7 @@ class Exercise(Base):
     
     id = Column(VARCHAR(32), primary_key=True, nullable=False)
     variation = Column(VARCHAR(32), primary_key=True, nullable=False)
-    domain = Column(Enum(DOMAIN), nullable=False)
     description = Column(Text, nullable=True)
     skills: Mapped[List["Skill"]] = relationship(
         secondary=exercise_skill, back_populates="excercises"
     )
-
-class Executaion(Base):
-    __tablename__ = "executions"
-
-    id = Column(VARCHAR(32), primary_key=True, nullable=False)
-    exercise_id = Column(ForeignKey("exercises.id"), primary_key=True, nullable=False)
-    variation = Column(ForeignKey("exercises.id"), primary_key=True, nullable=False)
-    updated_at = Column(TIMESTAMP, nullable=False)
-    executed_at = Column(TIMESTAMP, nullable=False)
-    difficulty = Column(VARCHAR(128), nullable=False)

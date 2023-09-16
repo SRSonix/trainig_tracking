@@ -3,10 +3,10 @@ from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
-from api.crud.crud import SkillCrud
-from api.crud.utils import UniqueIdException, ItemNotFoundException
-from api.schemas import Skill
-from api.utils import get_db
+from training_tracking.api.crud.crud import SkillCrud
+from training_tracking.api.crud.utils import UniqueIdException, ItemNotFoundException
+from training_tracking.api.schemas import Skill
+from training_tracking.api.utils import get_db
 
 router = APIRouter(
     prefix="/skills",
@@ -16,10 +16,11 @@ router = APIRouter(
 )
 
 @router.get("/", response_model=List[Skill])
-def get_skills(db: Session = Depends(get_db), id: Optional[str] = None, domain: Optional[str]= None):
-    skills = SkillCrud(db=db).get(id=id, domain=domain)
+def get_skills(db: Session = Depends(get_db), id: Optional[str] = None):
+    skills = SkillCrud(db=db).get(id=id)
     
-    return [Skill.parse_orm(skill) for skill in skills]
+    return [Skill.validate_orm(skill) for skill in skills]
+
     
 @router.post("/", response_model=Skill)
 def insert_skill(skill: Skill, db: Session = Depends(get_db)):
@@ -29,7 +30,8 @@ def insert_skill(skill: Skill, db: Session = Depends(get_db)):
         raise HTTPException(422, e.message)
     except UniqueIdException as e:
         raise HTTPException(409, e.message)
-    return Skill.parse_orm(db_skill)
+    return Skill.validate_orm(db_skill)
+
 
 @router.put("/{id}", response_model=Skill)
 def replace_skill(id: str, skill: Skill, db: Session = Depends(get_db)):
@@ -41,7 +43,7 @@ def replace_skill(id: str, skill: Skill, db: Session = Depends(get_db)):
     except ItemNotFoundException as e:
         raise HTTPException(404, e.message)
         
-    return Skill.parse_orm(skill)
+    return Skill.validate_orm(skill)
 
 
 @router.delete("/{id}")

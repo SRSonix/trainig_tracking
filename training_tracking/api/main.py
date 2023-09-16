@@ -1,7 +1,7 @@
 from typing import Union
 
 from fastapi import FastAPI, status
-from api.routers import skills, exercises
+from training_tracking.api.routers import skills, exercises
 
 app = FastAPI()
 

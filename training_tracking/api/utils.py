@@ -1,4 +1,4 @@
-from api.crud.utils import SessionLocal
+from training_tracking.api.crud.utils import SessionLocal
 
 # Dependency
 def get_db():

@@ -4,9 +4,9 @@ from abc import ABC, abstractmethod
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 
-from api.crud.models import Skill, Exercise
-from api.schemas import Skill as SkillSchema, Exercise as ExerciseSchema
-from api.crud.utils import UniqueIdException, ItemNotFoundException
+from training_tracking.api.crud.models import Skill, Exercise
+from training_tracking.api.schemas import Skill as SkillSchema, Exercise as ExerciseSchema
+from training_tracking.api.crud.utils import UniqueIdException, ItemNotFoundException
 
 
 class Crud(ABC):
@@ -40,27 +40,24 @@ class Crud(ABC):
 
 class SkillCrud(Crud):
     def to_orm(self, skill: SkillSchema) -> Exercise:
-        skill_db = Skill(id=skill.id, description=skill.description, domain=skill.domain)
+        skill_db = Skill(id=skill.id, description=skill.description)
         exercise_crud = ExerciseCrud(self.db)
         
-        for exercise in skill.excercises:
+        for exercise in skill.excercise_ids:
+            # todo: add error handling for exercide not found
             skill_db.excercises.append(exercise_crud.get_one(exercise.id, exercise.variation))
-        
+                
         return skill_db
     
     @staticmethod
-    def _apply_filter(query, id: Optional[str] = None, domain: Optional[str]=None):
+    def _apply_filter(query, id: Optional[str] = None):
         if id is not None:
-            print(id)
             query = query.filter(Skill.id == id)
-        if domain is not None:
-            print(domain)
-            query = query.filter(Skill.domain == domain)
         return query
         
-    def get(self, id: Optional[str] = None, domain: Optional[str]=None) -> List[Skill]:
+    def get(self, id: Optional[str] = None) -> List[Skill]:
         query = self.db.query(Skill)
-        query = self._apply_filter(query, id=id, domain=domain)
+        query = self._apply_filter(query, id=id)
         
         return query.all()
     
@@ -105,13 +102,15 @@ class ExerciseCrud(Crud):
         self.db = db
    
     def to_orm(self, exercise: ExerciseSchema) -> Exercise:
-        exercise_db = Exercise(id=exercise.id, variation=exercise.variation, domain=exercise.domain, description=exercise.description)
+        exercise_db = Exercise(id=exercise.id, variation=exercise.variation, description=exercise.description)
         skill_crud = SkillCrud(self.db)
         
-        for skill in exercise.skills:
-            exercise_db.skills.append(skill_crud.get_one(skill.id))
+        for id in exercise.skill_ids:
+            # todo: add error handling for skill not found
+            exercise_db.skills.append(skill_crud.get_one(id=id))
         
         return exercise_db
+
 
     def get(self) -> List[Exercise]:
         query = self.db.query(Exercise)

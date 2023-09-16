@@ -4,10 +4,10 @@ from fastapi import APIRouter, Depends, HTTPException
 
 from sqlalchemy.orm import Session
 
-from api.schemas import Exercise
-from api.crud.crud import ExerciseCrud
-from api.crud.utils import UniqueIdException, ItemNotFoundException
-from api.utils import get_db 
+from training_tracking.api.schemas import Exercise
+from training_tracking.api.crud.crud import ExerciseCrud
+from training_tracking.api.crud.utils import UniqueIdException, ItemNotFoundException
+from training_tracking.api.utils import get_db 
 
 router = APIRouter(
     prefix="/exercises",
@@ -20,7 +20,7 @@ router = APIRouter(
 def get_excercises(db: Session = Depends(get_db)):
     exercises = ExerciseCrud(db=db).get()
     
-    return [Exercise.parse_orm(e) for e in exercises]
+    return [Exercise.validate_orm(e) for e in exercises]
     
 @router.post("/", response_model=Exercise)
 def insert_excercice(skill: Exercise, db: Session = Depends(get_db)):
@@ -30,7 +30,7 @@ def insert_excercice(skill: Exercise, db: Session = Depends(get_db)):
         raise HTTPException(422, e.message)
     except UniqueIdException as e:
         raise HTTPException(409, e.message)
-    return Exercise.parse_orm(db_skill)
+    return Exercise.validate_orm(db_skill)
 
 @router.put("/{id}/{variation}", response_model=Exercise)
 def replace_skill(id: str, variation:str, exercise: Exercise, db: Session = Depends(get_db)):
@@ -42,7 +42,7 @@ def replace_skill(id: str, variation:str, exercise: Exercise, db: Session = Depe
     except ItemNotFoundException as e:
         raise HTTPException(404, e.message)
         
-    return Exercise.parse_orm(exercise)
+    return Exercise.validate_orm(exercise)
 
 @router.delete("/{id}/{variation}")
 def delete_skill(id: str, variation:str, db: Session = Depends(get_db)):
