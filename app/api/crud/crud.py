@@ -40,7 +40,7 @@ class Crud(ABC):
 
 class SkillCrud(Crud):
     def to_orm(self, skill: SkillSchema) -> Exercise:
-        skill_db = Skill(id=skill.id, description=skill.description)
+        skill_db = Skill(id=skill.id, description=skill.description, domain=skill.domain)
         exercise_crud = ExerciseCrud(self.db)
         
         for exercise in skill.excercises:
@@ -48,8 +48,19 @@ class SkillCrud(Crud):
         
         return skill_db
     
-    def get(self) -> List[Skill]:
+    @staticmethod
+    def _apply_filter(query, id: Optional[str] = None, domain: Optional[str]=None):
+        if id is not None:
+            print(id)
+            query = query.filter(Skill.id == id)
+        if domain is not None:
+            print(domain)
+            query = query.filter(Skill.domain == domain)
+        return query
+        
+    def get(self, id: Optional[str] = None, domain: Optional[str]=None) -> List[Skill]:
         query = self.db.query(Skill)
+        query = self._apply_filter(query, id=id, domain=domain)
         
         return query.all()
     
@@ -83,7 +94,7 @@ class SkillCrud(Crud):
         return skill_db
         
     def delete(self, id: str) -> None:
-        skill = self.get_skill(id)
+        skill = self.get_one(id)
             
         self.db.delete(skill)
         self.db.commit()
@@ -137,7 +148,7 @@ class ExerciseCrud(Crud):
         return exercise_db
     
     def delete(self, id: str, variation) -> None:
-        exercise = self.get_exercise(id=id, variation=variation)
+        exercise = self.get_one(id=id, variation=variation)
             
         self.db.delete(exercise)
         self.db.commit()

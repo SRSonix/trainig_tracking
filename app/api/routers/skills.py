@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
@@ -16,8 +16,8 @@ router = APIRouter(
 )
 
 @router.get("/", response_model=List[Skill])
-def get_skills(db: Session = Depends(get_db)):
-    skills = SkillCrud(db=db).get()
+def get_skills(db: Session = Depends(get_db), id: Optional[str] = None, domain: Optional[str]= None):
+    skills = SkillCrud(db=db).get(id=id, domain=domain)
     
     return [Skill.parse_orm(skill) for skill in skills]
     

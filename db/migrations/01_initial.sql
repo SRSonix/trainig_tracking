@@ -2,6 +2,7 @@ CREATE TYPE DOMAIN AS ENUM ('gym', 'running', 'drums', 'guitar');
 
 CREATE TABLE skills(
     id VARCHAR(32) NOT NULL PRIMARY KEY,
+    domain DOMAIN NOT NULL,
     description text
 );
 

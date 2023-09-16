@@ -402,6 +402,23 @@ anyio = ">=3.4.0,<5"
 full = ["httpx (>=0.22.0)", "itsdangerous", "jinja2", "python-multipart", "pyyaml"]
 
 [[package]]
+name = "training-tracking-shared-models"
+version = "0.1.0"
+description = ""
+category = "main"
+optional = false
+python-versions = "^3.11"
+files = []
+develop = true
+
+[package.dependencies]
+pydantic = "^1.10.7"
+
+[package.source]
+type = "directory"
+url = "../shared_models"
+
+[[package]]
 name = "typing-extensions"
 version = "4.5.0"
 description = "Backported and Experimental Type Hints for Python 3.7+"
@@ -435,4 +452,4 @@ standard = ["colorama (>=0.4)", "httptools (>=0.5.0)", "python-dotenv (>=0.13)",
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "d245f344065e18480d8b13f21b361c741cc924ea72fbc85b721b587b1a643ff4"
+content-hash = "65f76ec64379041e7417a07d08a9fc9bebcc9df77c6634f75142b3ae5138141f"

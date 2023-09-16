@@ -1,11 +1,12 @@
 version: '3'
 services:
   app:
-    build: .
+    image: python:3.11
     ports: 
       - 8080:8080
     volumes:
-      - ./app/api:/code/api
+      - ./app:/code/app
+      - ./shared_models:/code/shared_models
     env_file:
       - env/local.env
     environment:
@@ -18,7 +19,7 @@ services:
       - /bin/bash
       - -c
       - |
-        cd /code
+        cd /code/app
         pip install --upgrade pip && pip install poetry
         poetry config virtualenvs.create false
         poetry install
@@ -35,7 +36,7 @@ services:
     ports: 
       - 5432:5432
     volumes:
-      - ./pgData:/var/lib/psotgresql/data
+      - ./pgData:/var/lib/postgresql/data
 
   adminer:
     image: adminer

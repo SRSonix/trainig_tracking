@@ -1,17 +1,12 @@
 #from __future__ import annotations
 from typing import List
 
-import enum
 from sqlalchemy import Table, Column, ForeignKey, VARCHAR, Text, Enum, TIMESTAMP, ForeignKeyConstraint
 from sqlalchemy.orm import relationship, Mapped
 
-from api.crud.utils import Base
+from shared_models.schemas import Domain as DOMAIN
 
-class DOMAIN(enum.Enum):
-    gym='gym'
-    running='running'
-    drums='drums'
-    guitar='guitar'
+from api.crud.utils import Base
 
 exercise_skill = Table(
     "exercise_skill",
@@ -27,6 +22,7 @@ class Skill(Base):
     
     id = Column(VARCHAR(32), primary_key=True, nullable=False)
     description = Column(Text, nullable=True)
+    domain = Column(Enum(DOMAIN), nullable=False)
     excercises: Mapped[List["Exercise"]] = relationship(
         secondary=exercise_skill, back_populates="skills"
     )
