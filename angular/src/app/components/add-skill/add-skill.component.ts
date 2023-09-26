@@ -21,9 +21,6 @@ export class AddSkillComponent implements OnInit{
   }
 
   refresh() {
-
-    console.log("refresh")
-
     this.exercises.clear()
     this.apiService.getExercises().subscribe((exercieses) => {
 

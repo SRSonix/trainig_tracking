@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import {Skill} from "../../Models";
-import { SkillsService } from 'src/app/services/skills.service';
+import { ApiService } from 'src/app/services/api.service';
 
 @Component({
   selector: 'app-skills',
@@ -8,28 +8,26 @@ import { SkillsService } from 'src/app/services/skills.service';
   styleUrls: ['./skills.component.css']
 })
 export class SkillsComponent implements OnInit{
-
   skills: Skill[] = [];
   showAdd: boolean = false;
 
-  constructor(private skillService: SkillsService){}
+  constructor(private apiService: ApiService){}
 
   ngOnInit(): void {
-      this.skillService.getSkills().subscribe((skills) => this.skills = skills);
+      this.apiService.getSkills().subscribe((skills) => this.skills = skills);
   }
 
   deleteSkill(skill: Skill){
-    this.skillService.deleteSkill(skill).subscribe(() => this.skills = this.skills.filter(t => t.id !== skill.id ) )
+    this.apiService.deleteSkill(skill).subscribe(() => this.skills = this.skills.filter(t => t.id !== skill.id ) )
   }
 
   createSkill(skill: Skill){
-    this.skillService.createSkill(skill).subscribe((skill: Skill) => this.skills.push(skill));
+    this.apiService.createSkill(skill).subscribe((skill: Skill) => this.skills.push(skill));
 
     this.showAdd = false;
   }
 
   toggleAdd(){
-    console.log("test");
     this.showAdd = !this.showAdd;
   }
 }
