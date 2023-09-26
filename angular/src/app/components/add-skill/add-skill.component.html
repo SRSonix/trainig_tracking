@@ -1,0 +1,18 @@
+<form class="add-form" (ngSubmit)="onSubmit()">
+    <label for="id">Skill id</label>
+    <input type="text" name="id" id="id" placeholder="skill id" [(ngModel)]="id" />
+    <label for="description">Skill description</label>
+    <textarea name="description" id="description" placeholder="skill description" [(ngModel)]="description"></textarea>
+    <label for="exercises">exercises</label>
+    <div name="exercises" id="exercises" placeholder="add exercises">
+        <ul>
+            <li
+                *ngFor="let keyvalue of exercises | keyvalue"
+                [ngClass]="{'active':keyvalue.value}"
+                (click)="toggleExercise(keyvalue.key)"
+            >{{keyvalue.key.id}} / {{keyvalue.key.variation}}</li>
+        </ul>
+    </div>
+    <input type="submit" value="Save Skill" class="btn"/>
+    <input type="button" value="refresh exercieses" class="btn" (click)="refresh()"/>
+</form>

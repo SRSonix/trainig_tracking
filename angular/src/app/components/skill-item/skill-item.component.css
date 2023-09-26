@@ -1,0 +1,29 @@
+.skill {
+    background-color: rgb(59, 160, 131);
+    color: white;
+    padding: 1em;
+    margin: 0.5em 0;
+  } 
+
+.skill p{
+  text-align: justify;
+}
+
+.skill-header{
+  display: flex;
+  justify-content: space-between;
+}
+
+.skill-header h3, .skill-header p{
+  margin: auto 0;
+}
+
+.skill-header p{
+  font-size: 1.3em;
+}
+
+h4{
+  margin-top: 0.5em;
+}
+
+

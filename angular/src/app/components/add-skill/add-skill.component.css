@@ -1,0 +1,33 @@
+label{
+    display: block;
+}
+
+input, #exercises, textarea{
+    margin-bottom: 0.5em;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+textarea{
+    resize: vertical;
+}
+
+div{
+    box-sizing: border-box;
+}
+
+#exercises{
+    max-height: 10em;
+    border: gray solid 1px;
+    border-radius: 1px;
+    overflow-y:auto
+}
+
+.active{
+    background-color: darkgray;
+}
+
+li {
+    padding: 0.3em 0;
+    text-align: center;
+}

@@ -1,0 +1,15 @@
+<div class="skill" (click)="toggleExpand()">
+    <div class="skill-header">
+        <h3>{{skill.id}}</h3>
+        <p>
+            <fa-icon [icon]=iconClose [ngStyle]="{'color':'red'}" (click)="$event.stopPropagation()" (dblclick)="onDelete($event)"></fa-icon>
+        </p>
+    </div>
+    <p *ngIf="expanded">{{skill.description}}</p>
+    <div *ngIf="expanded">
+        <h4>exercises</h4>
+        <ul>
+            <li *ngFor="let e of skill.excercise_ids">{{e.id}}/{{e.variation}}</li>
+        </ul>
+    </div>
+</div>

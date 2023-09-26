@@ -1,0 +1,23 @@
+<section class="content-header">
+    <h1>Skills</h1>
+    <div>
+        <button
+            (click)="toggleAdd()" >
+        {{showAdd ? 'hide add ': 'show add'}} 
+        </button>
+    </div>
+</section>
+<section  
+    *ngIf="showAdd"
+    class="container">
+    <app-add-skill 
+        (onCreateSkill)="createSkill($event)"
+    ></app-add-skill>
+</section>
+<section  class="container">
+    <app-skill-item 
+        *ngFor="let skill of skills"
+        [skill]="skill" 
+        (onDeleteSkill)="deleteSkill(skill)"
+    ></app-skill-item>
+</section>

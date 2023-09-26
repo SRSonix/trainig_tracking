@@ -1,5 +1,21 @@
 version: '3'
 services:
+  angular: 
+    image: node:18
+    ports:
+    - 4200:4200
+    dns:
+    - 8.8.8.8
+    - 1.1.1.1
+    volumes:
+      - ./angular:/code
+    command:
+      - /bin/bash
+      - -c
+      - | 
+        cd /code
+        npm install -g @angular/cli 
+        ng serve --host 0.0.0.0 --port 4200
   app:
     image: python:3.11
     ports: 
